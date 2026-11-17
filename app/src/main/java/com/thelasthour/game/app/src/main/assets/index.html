@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE LAST HOUR</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#080b0b;color:#ddd;
+ font-family:Georgia,serif;text-align:center;
+}
+.screen{min-height:100vh;padding:35px 20px;
+ display:flex;flex-direction:column;justify-content:center;align-items:center}
+h1{font-size:38px;letter-spacing:5px;color:#c8c5b9}
+h2{color:#b9b5a7}
+p{color:#999;line-height:1.6}
+button{
+ background:#202725;color:#ddd;border:1px solid #777;
+ padding:14px 22px;margin:8px;font-size:15px;
+ width:220px;max-width:90%;border-radius:3px;
+}
+button:active{background:#46504a}
+.hidden{display:none}
+#scene{
+ background:linear-gradient(#111918,#080909);
+ border:1px solid #454b45;padding:25px 12px;
+ width:100%;min-height:220px;margin:15px 0;
+}
+#message{color:#c5c0a9;min-height:45px}
+.stats{display:flex;justify-content:space-around;width:100%;
+ color:#aaa;font-size:14px}
+</style>
+</head>
+<body>
+
+<div id="menu" class="screen">
+<h1>THE LAST HOUR</h1>
+<p>Something is still awake.</p>
+<p>ST. JUDE MEMORIAL<br>EVACUATED — 1989</p>
+<button onclick="startGame()">NEW GAME</button>
+<button onclick="showSettings()">SETTINGS</button>
+<p style="font-size:12px">CHAPTER 01 — THE GROUND FLOOR</p>
+</div>
+
+<div id="settings" class="screen hidden">
+<h2>SETTINGS</h2>
+<p>Survive the abandoned hospital.</p>
+<button onclick="showMenu()">BACK</button>
+</div>
+
+<div id="game" class="screen hidden">
+<h2>ST. JUDE MEMORIAL</h2>
+<div class="stats">
+<span>BATTERY: <b id="battery">100</b>%</span>
+<span>HEALTH: 100%</span>
+</div>
+
+<div id="scene">
+<h2 id="location">RECEPTION</h2>
+<p id="message">The hospital is silent. Find a way forward.</p>
+</div>
+
+<button onclick="move()">WALK FORWARD</button>
+<button onclick="look()">LOOK AROUND</button>
+<button onclick="interact()">INTERACT</button>
+<button onclick="pauseGame()">PAUSE</button>
+</div>
+
+<div id="pause" class="screen hidden">
+<h2>PAUSED</h2>
+<button onclick="resumeGame()">RESUME</button>
+<button onclick="showMenu()">MAIN MENU</button>
+</div>
+
+<script>
+let battery=100;
+let room=0;
+let hasKey=false;
+
+const rooms=[
+ "RECEPTION",
+ "DARK CORRIDOR",
+ "RECORDS ROOM",
+ "EXIT DOOR"
+];
+
+function hideAll(){
+ ["menu","settings","game","pause"].forEach(
+ id=>document.getElementById(id).classList.add("hidden")
+ );
+}
+
+function showMenu(){
+ hideAll();
+ document.getElementById("menu").classList.remove("hidden");
+}
+
+function showSettings(){
+ hideAll();
+ document.getElementById("settings").classList.remove("hidden");
+}
+
+function startGame(){
+ battery=100;
+ room=0;
+ hasKey=false;
+ update();
+ hideAll();
+ document.getElementById("game").classList.remove("hidden");
+ say("The hospital is silent. Find a way forward.");
+}
+
+function say(text){
+ document.getElementById("message").innerText=text;
+}
+
+function update(){
+ document.getElementById("battery").innerText=battery;
+ document.getElementById("location").innerText=rooms[room];
+}
+
+function move(){
+ if(battery<=0){
+ say("Your flashlight has run out. You cannot continue safely.");
+ return;
+ }
+ battery=Math.max(0,battery-10);
+
+ if(room<3) room++;
+
+ if(room===3 && !hasKey){
+ say("The exit is locked. Search the records room for a key.");
+ }else if(room===3){
+ say("You found the exit. Chapter completed!");
+ }else{
+ say("You move deeper into the abandoned hospital...");
+ }
+ update();
+}
+
+function look(){
+ if(room===2 && !hasKey){
+ say("You notice a small key on the desk. It may open the exit.");
+ }else if(room===3){
+ say("An old exit door stands in front of you.");
+ }else{
+ say("Dust covers everything. You hear a faint sound nearby.");
+ }
+}
+
+function interact(){
+ if(room===2 && !hasKey){
+ hasKey=true;
+ say("You picked up the old key!");
+ }else if(room===3 && hasKey){
+ say("The key unlocks the door. YOU ESCAPED!");
+ }else{
+ say("There is nothing to interact with here.");
+ }
+}
+
+function pauseGame(){
+ hideAll();
+ document.getElementById("pause").classList.remove("hidden");
+}
+
+function resumeGame(){
+ hideAll();
+ document.getElementById("game").classList.remove("hidden");
+}
+</script>
+</body>
+  </html>
